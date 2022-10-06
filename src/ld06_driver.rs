@@ -47,6 +47,8 @@ impl<R: Read<u8>> LD06<R> {
 
         // If full scan has been read
         if self.packet_idx == 47 {
+            self.packet_idx = 0;
+
             //Run CRC checksum
             if crc8(&self.wip_scan[0..=46]) != 0 {
                 return Err(nb::Error::Other(ParseError::CrcFail));
@@ -69,7 +71,6 @@ impl<R: Read<u8>> LD06<R> {
             packet.stamp = byteorder::LE::read_u16(&buf[44..=45]);
             packet.crc = buf[46];
 
-            self.packet_idx = 0;
             Ok(Some(packet))
         } else {
             Ok(None)

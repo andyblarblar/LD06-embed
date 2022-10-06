@@ -1,5 +1,5 @@
 [package]
-name = "LD06-embed"
+name = "ld06-embed"
 version = "0.1.0"
 edition = "2021"
 

@@ -1,0 +1,8 @@
+[package]
+name = "ld06-embed-examples"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ld06-embed = {path = "../../../LD06-embed"}
+linux-embedded-hal = "0.3.2"
