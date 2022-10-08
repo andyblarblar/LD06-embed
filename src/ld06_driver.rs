@@ -5,6 +5,7 @@ use crate::crc::crc8;
 use crate::error::ParseError;
 use embedded_hal::serial::Read;
 use nb::Result;
+use pid::Pid;
 
 pub struct LD06<R: Read<u8>> {
     reader: R,
@@ -72,6 +73,36 @@ impl<R: Read<u8>> LD06<R> {
             packet.crc = buf[46];
 
             Ok(Some(packet))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub fn into_pid(self) -> LD06Pid<R> {
+        todo!()
+    }
+}
+
+pub struct LD06Pid<R: Read<u8>> {
+    inner: LD06<R>,
+    pid: Pid<f32>,
+}
+
+impl<R: Read<u8>> LD06Pid<R> {
+
+    /// Reads the next byte from the serial buffer, appending it to the wip scan. If a scan was completed,
+    /// it will be returned. If an error occurs, the current packet will be corrupted, but the system will
+    /// recover on the start of the next packet.
+    ///
+    /// This variant will also output the next PID output, in degrees per second the LiDAR should run at.
+    ///
+    /// This functions blocking behavior will be determined by the underlying serial read function.
+    pub fn read_next_byte(&mut self) -> Result<Option<(PartialScan, u16)>, ParseError> {
+        let res = self.inner.read_next_byte()?;
+
+        if let Some(scan) = res {
+            let out = self.pid.next_control_output(scan.radar_speed as f32);
+            Ok(Some((scan, out.output as u16)))
         } else {
             Ok(None)
         }
