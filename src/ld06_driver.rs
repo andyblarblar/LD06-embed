@@ -78,8 +78,12 @@ impl<R: Read<u8>> LD06<R> {
         }
     }
 
+    /// Adds motor speed PID control output
     pub fn into_pid(self) -> LD06Pid<R> {
-        todo!()
+        //TODO calibrate PID
+        let pid = Pid::new(0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 4000.0, 3500.0);
+
+        LD06Pid { inner: self, pid }
     }
 }
 
@@ -89,7 +93,6 @@ pub struct LD06Pid<R: Read<u8>> {
 }
 
 impl<R: Read<u8>> LD06Pid<R> {
-
     /// Reads the next byte from the serial buffer, appending it to the wip scan. If a scan was completed,
     /// it will be returned. If an error occurs, the current packet will be corrupted, but the system will
     /// recover on the start of the next packet.
@@ -106,5 +109,9 @@ impl<R: Read<u8>> LD06Pid<R> {
         } else {
             Ok(None)
         }
+    }
+
+    pub fn get_max_lidar_speed() -> u16 {
+        todo!()
     }
 }
