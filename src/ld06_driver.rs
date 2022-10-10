@@ -80,8 +80,8 @@ impl<R: Read<u8>> LD06<R> {
 
     /// Adds motor speed PID control output
     pub fn into_pid(self) -> LD06Pid<R> {
-        //TODO calibrate PID
-        let pid = Pid::new(0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 4000.0, 3500.0);
+        //TODO calibrate PID. These current numbers are from reverse engineering the controller
+        let pid = Pid::new(10.0f32, 10.0, 3.0, 500.0, 500.0, 500.0, 14_400.0, 3600.0);
 
         LD06Pid { inner: self, pid }
     }
@@ -112,6 +112,6 @@ impl<R: Read<u8>> LD06Pid<R> {
     }
 
     pub fn get_max_lidar_speed() -> u16 {
-        todo!()
+        14400 //In theory
     }
 }

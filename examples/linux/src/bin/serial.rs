@@ -14,7 +14,7 @@ fn main() {
     loop {
         match ld06.read_next_byte() {
             Ok(None) => {
-                println!("Read byte {}", byte_num);
+                //println!("Read byte {}", byte_num);
                 byte_num += 1;
             }
             Err(err) => match err {
