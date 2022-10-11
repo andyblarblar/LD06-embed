@@ -39,7 +39,7 @@ impl PartialScan {
     /// The reading number in this case is 0 indexed.
     pub fn get_angle_of_reading(&self, reading_num: u16) -> f32 {
         let angle = self.start_angle + self.get_step() * (reading_num) as f32;
-        let spins = (angle / 360.0).floor();
+        let spins = (angle / 360.0) as u8 as f32;
         angle - 360.0 * spins
     }
 }
