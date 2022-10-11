@@ -6,3 +6,5 @@ mod ld06_driver;
 pub mod error;
 
 pub use ld06_driver::*;
+
+pub use nb;
