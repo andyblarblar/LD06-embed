@@ -111,7 +111,7 @@ impl<R: Read<u8>> LD06Pid<R> {
         }
     }
 
-    pub fn get_max_lidar_speed() -> u16 {
+    pub fn get_max_lidar_speed(&self) -> u16 {
         14400 //In theory
     }
 }
