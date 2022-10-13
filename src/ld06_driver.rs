@@ -7,6 +7,11 @@ use embedded_hal::serial::Read;
 use nb::Result;
 use pid::Pid;
 
+/// An LD06 Peripheral.
+///
+/// This driver will not control the PWM of the LiDAR, if you are not using the included speed control board
+/// please use [into_pid] to add motor speed control. Due to a lack of a proper embedded_hal PWM interface, you
+/// will need to apply the PID value to the PWM line yourself.
 pub struct LD06<R: Read<u8>> {
     reader: R,
     /// The current scan being processed.
@@ -81,12 +86,13 @@ impl<R: Read<u8>> LD06<R> {
     /// Adds motor speed PID control output
     pub fn into_pid(self) -> LD06Pid<R> {
         //TODO calibrate PID. These current numbers are from reverse engineering the controller
-        let pid = Pid::new(10.0f32, 10.0, 3.0, 500.0, 500.0, 500.0, 14_400.0, 3600.0);
+        let pid = Pid::new(10.0f32, 10.0, 0.0, 500.0, 500.0, 500.0, 14_400.0, 3600.0);
 
         LD06Pid { inner: self, pid }
     }
 }
 
+/// LDO6 peripheral driver that includes PID control for the motor.
 pub struct LD06Pid<R: Read<u8>> {
     inner: LD06<R>,
     pid: Pid<f32>,
@@ -111,6 +117,8 @@ impl<R: Read<u8>> LD06Pid<R> {
         }
     }
 
+    /// Returns the max lidar speed, in degrees per second. This can be used to find the duty % to send
+    /// to the LiDAR motor given a PID control speed.
     pub fn get_max_lidar_speed(&self) -> u16 {
         14400 //In theory
     }
