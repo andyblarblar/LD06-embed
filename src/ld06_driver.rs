@@ -83,7 +83,7 @@ impl<R: Read<u8>> LD06<R> {
         }
     }
 
-    /// Adds motor speed PID control output
+    /// Adds motor speed PID control output.
     pub fn into_pid(self) -> LD06Pid<R> {
         //TODO calibrate PID. These current numbers are from reverse engineering the controller
         let pid = Pid::new(10.0f32, 10.0, 0.0, 500.0, 500.0, 500.0, 14_400.0, 3600.0);
