@@ -46,7 +46,7 @@ impl PartialScan {
     /// Translates the range from polar coordinates in terms of the LiDAR to polar coordinates in the standard format.
     /// All angles are still in degrees.
     pub fn get_range_in_polar(&self, reading_num: u16) -> (f32, f32) {
-        let range = self.data[reading_num as usize].dist as f32; //TODO test
+        let range = self.data[reading_num as usize].dist as f32;
         let angle = self.get_angle_of_reading(reading_num);
 
         let mut p_deg = 90.0 - angle;
@@ -55,6 +55,6 @@ impl PartialScan {
                 p_deg += 360.0;
             }
         }
-        (range, angle)
+        (range, p_deg)
     }
 }
