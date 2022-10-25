@@ -32,7 +32,9 @@ pub struct PartialScan {
 impl PartialScan {
     /// Gets the angular step per range reading.
     pub fn get_step(&self) -> f32 {
-        (self.end_angle - self.start_angle + 360.0) / (self.data.len() - 1) as f32
+        let diff =
+            ((self.end_angle * 100.0) as usize + 36000 - (self.start_angle * 100.0) as usize) % 360;
+        (diff / (self.data.len() - 1)) as f32 / 100.0
     }
 
     /// Calculates the angle the nth reading was at in this packet.
