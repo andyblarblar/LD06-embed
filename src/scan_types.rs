@@ -32,6 +32,7 @@ pub struct PartialScan {
 impl PartialScan {
     /// Gets the angular step per range reading.
     pub fn get_step(&self) -> f32 {
+        // This is all to get the mod as an int to avoid floating point errors
         let diff =
             ((self.end_angle * 100.0) as usize + 36000 - (self.start_angle * 100.0) as usize) % 360;
         (diff / (self.data.len() - 1)) as f32 / 100.0
@@ -40,9 +41,11 @@ impl PartialScan {
     /// Calculates the angle the nth reading was at in this packet.
     /// The reading number in this case is 0 indexed.
     pub fn get_angle_of_reading(&self, reading_num: u16) -> f32 {
-        let angle = self.start_angle + self.get_step() * (reading_num) as f32;
-        let spins = (angle / 360.0) as u8 as f32;
-        angle - 360.0 * spins
+        let mut angle = self.start_angle + self.get_step() * (reading_num) as f32;
+        if angle >= 360.0 {
+            angle -= 360.0;
+        }
+        angle
     }
 
     /// Translates the range from polar coordinates in terms of the LiDAR to polar coordinates in the standard format.
