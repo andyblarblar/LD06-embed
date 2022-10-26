@@ -92,7 +92,7 @@ impl<R: Read<u8>> LD06<R> {
     }
 }
 
-/// LDO6 peripheral driver that includes PID control for the motor.
+/// LD06 peripheral driver that includes PID control for the motor.
 pub struct LD06Pid<R: Read<u8>> {
     inner: LD06<R>,
     pid: Pid<f32>,

@@ -1,5 +1,4 @@
 /// A range reading from the sensor.
-#[repr(C)]
 #[derive(Copy, Clone, Debug, Default)]
 pub struct Range {
     /// The distance from the unit, in mm.
@@ -49,6 +48,7 @@ impl PartialScan {
     }
 
     /// Translates the range from polar coordinates in terms of the LiDAR to polar coordinates in the standard format.
+    /// In practice, this is rotating all points by 90 degrees clockwise, then reflecting.
     /// All angles are still in degrees.
     pub fn get_range_in_polar(&self, reading_num: u16) -> (f32, f32) {
         let range = self.data[reading_num as usize].dist as f32;
