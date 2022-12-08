@@ -4,7 +4,7 @@ use byteorder::ByteOrder;
 use crate::crc::crc8;
 use crate::error::ParseError;
 use embedded_hal::serial::Read;
-use nb::Result;
+use nb::{Error, Result};
 use pid::Pid;
 
 /// An LD06 Peripheral.
@@ -40,8 +40,19 @@ impl<R: Read<u8>> LD06<R> {
     /// recover on the start of the next packet.
     ///
     /// This functions blocking behavior will be determined by the underlying serial read function.
-    pub fn read_next_byte(&mut self) -> Result<Option<PartialScan>, ParseError> {
-        let byte = self.reader.read().map_err(|_| ParseError::SerialErr)?;
+    pub fn read_next_byte(&mut self) -> Result<Option<PartialScan>, ParseError<R::Error>> {
+        let byte = self.reader.read();
+
+        if let Err(err) = byte {
+            return match err {
+                // We cannot know what the errors the generic serial will have, so just glob them
+                Error::Other(err) => Err(Error::Other(ParseError::SerialErr(err))),
+                // Just skip read if would block
+                Error::WouldBlock => Ok(None),
+            };
+        }
+
+        let byte = unsafe { byte.unwrap_unchecked() };
 
         // The first packet may be misaligned, as the lidar writes at all times. Restart if that is the case.
         if byte == 0x54 && self.packet_idx != 0 {
@@ -86,7 +97,7 @@ impl<R: Read<u8>> LD06<R> {
     /// Adds motor speed PID control output.
     pub fn into_pid(self) -> LD06Pid<R> {
         //TODO calibrate PID. These current numbers are from reverse engineering the controller
-        let pid = Pid::new(10.0f32, 10.0, 0.0, 500.0, 500.0, 500.0, 14_400.0, 3600.0);
+        let pid = Pid::new(10.0f32, 2.0, 2.0, 500.0, 500.0, 500.0, 14_400.0, 3600.0);
 
         LD06Pid { inner: self, pid }
     }
@@ -106,7 +117,7 @@ impl<R: Read<u8>> LD06Pid<R> {
     /// This variant will also output the next PID output, in degrees per second the LiDAR should run at.
     ///
     /// This functions blocking behavior will be determined by the underlying serial read function.
-    pub fn read_next_byte(&mut self) -> Result<Option<(PartialScan, u16)>, ParseError> {
+    pub fn read_next_byte(&mut self) -> Result<Option<(PartialScan, u16)>, ParseError<R::Error>> {
         let res = self.inner.read_next_byte()?;
 
         if let Some(scan) = res {
