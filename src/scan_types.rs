@@ -33,7 +33,7 @@ impl PartialScan {
     pub fn get_step(&self) -> f32 {
         // This is all to get the mod as an int to avoid floating point errors
         let diff =
-            ((self.end_angle * 100.0) as usize + 36000 - (self.start_angle * 100.0) as usize) % 360;
+            ((self.end_angle * 100.0) as usize + 36000 - (self.start_angle * 100.0) as usize) % 36000;
         (diff / (self.data.len() - 1)) as f32 / 100.0
     }
 
