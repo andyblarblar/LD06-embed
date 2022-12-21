@@ -16,3 +16,6 @@ embedded-hal = "0.2.7"
 nb = "1.0.0"
 byteorder = { version = "1", default-features = false }
 pid = "3.0.0"
+
+[dev-dependencies]
+embedded-hal-mock = "0.8.0"

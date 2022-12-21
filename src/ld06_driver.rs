@@ -133,3 +133,53 @@ impl<R: Read<u8>> LD06Pid<R> {
         14400 //In theory
     }
 }
+
+#[cfg(test)]
+mod test {
+    extern crate std;
+    use crate::{Range, LD06};
+    use embedded_hal_mock::serial::{Mock, Transaction};
+    use std::prelude::rust_2021::*;
+
+    // Example scan from the manual
+    const REF_BYTES: &[u8] = &[
+        0x54, 0x2C, 0x68, 0x08, 0xAB, 0x7E, 0xE0, 0x00, 0xE4, 0xDC, 0x00, 0xE2, 0xD9, 0x00, 0xE5,
+        0xD5, 0x00, 0xE3, 0xD3, 0x00, 0xE4, 0xD0, 0x00, 0xE9, 0xCD, 0x00, 0xE4, 0xCA, 0x00, 0xE2,
+        0xC7, 0x00, 0xE9, 0xC5, 0x00, 0xE5, 0xC2, 0x00, 0xE5, 0xC0, 0x00, 0xE5, 0xBE, 0x82, 0x3A,
+        0x1A, 0x50,
+    ];
+
+    #[test]
+    fn test_lidar_read() {
+        let expectations = &[Transaction::read_many(REF_BYTES)];
+        let mock = Mock::new(expectations);
+
+        let mut ld06 = LD06::new(mock);
+
+        let scan = loop {
+            if let Ok(Some(scan)) = ld06.read_next_byte() {
+                break scan;
+            }
+        };
+
+        assert_eq!(scan.radar_speed, 2152);
+        assert_eq!(scan.start_angle, 324.27);
+        assert_eq!(scan.end_angle, 334.7);
+        assert_eq!(scan.crc, 0x50);
+        assert_eq!(scan.stamp, 0x1a3a);
+        assert_eq!(
+            scan.data[0],
+            Range {
+                confidence: 228,
+                dist: 224
+            }
+        );
+        assert_eq!(
+            scan.data[1],
+            Range {
+                confidence: 226,
+                dist: 220
+            }
+        );
+    }
+}

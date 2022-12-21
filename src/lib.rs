@@ -9,10 +9,12 @@
 //! ## Example
 //! (see [here](./examples/linux) for runnable example on linux)
 //!
-//!```no_run
+//!```rust
 //! # use nb::Error;
 //! # use ld06_embed::error::ParseError;
 //! # use ld06_embed::LD06;
+//! # use embedded_hal_mock::serial::{Mock, Transaction};
+//! # let serial = Mock::new(&[Transaction::read(0x54)]);
 //! let mut ld06 = LD06::new(serial);
 //!
 //! loop {
@@ -35,6 +37,7 @@
 //!             println!("scan: {:?}", scan);
 //!         }
 //!     }
+//! # break;
 //! }
 //! ```
 

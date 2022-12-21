@@ -1,5 +1,5 @@
 /// A range reading from the sensor.
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct Range {
     /// The distance from the unit, in mm.
     pub dist: u16,
