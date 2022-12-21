@@ -3,6 +3,13 @@ name = "ld06-embed"
 authors = ["Andrew Ealovega <Andrew@Ealovega.dev>"]
 version = "0.1.0"
 edition = "2021"
+categories = ["embedded", "no-std", "science::robotics"]
+keywords = ["embedded-hal-driver", "lidar"]
+description = "Embedded periferal driver for the LD06 LiDAR"
+homepage = "https://github.com/andyblarblar/LD06-embed"
+repository = "https://github.com/andyblarblar/LD06-embed"
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 embedded-hal = "0.2.7"

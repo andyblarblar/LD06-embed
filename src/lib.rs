@@ -1,9 +1,49 @@
+//!This crate is an embedded_hal peripheral driver for the LD06/LD09 drivers sold under various brands.
+//!
+//! ## Setup
+//! To use this crate, simply connect to the LD06 UART via an interface of your choice, then pass that interface to the
+//! LD06 struct found in this crate. Note that it seems the LiDAR needs a PWM signal for motor control as it has a PWM pin,
+//! but in my experience this has not been the case. Nonetheless, I have provided a wrapper struct that also provides PID
+//! control for this signal, should it be needed for your use case.
+//!
+//! ## Example
+//! (see [here](./examples/linux) for runnable example on linux)
+//!
+//!```no_run
+//! # use nb::Error;
+//! # use ld06_embed::error::ParseError;
+//! # use ld06_embed::LD06;
+//! let mut ld06 = LD06::new(serial);
+//!
+//! loop {
+//!     match ld06.read_next_byte() {
+//!         Ok(None) => {}
+//!         Err(err) => match err {
+//!             Error::Other(parse_err) => match parse_err {
+//!                 ParseError::SerialErr(_) => {
+//!                     println!("Serial issue")
+//!                 }
+//!                 ParseError::CrcFail => {
+//!                     println!("CRC failed")
+//!                 }
+//!             },
+//!             Error::WouldBlock => {
+//!                 println!("Would block")
+//!             }
+//!         },
+//!         Ok(Some(scan)) => {
+//!             println!("scan: {:?}", scan);
+//!         }
+//!     }
+//! }
+//! ```
+
 #![no_std]
 
-mod scan_types;
 mod crc;
-mod ld06_driver;
 pub mod error;
+mod ld06_driver;
+mod scan_types;
 
 pub use ld06_driver::*;
 
